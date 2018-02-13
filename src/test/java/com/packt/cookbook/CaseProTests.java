@@ -17,6 +17,39 @@ import static org.hamcrest.Matchers.*;
 public class CaseProTests {
 
     @Test
+    public void loginwith200() {
+        // cookieFilter сохранить cookie,
+        // что позволит оставаться аутентифицированным пользователем
+        CookieFilter cookieFilter = new CookieFilter();
+
+        RestAssured.baseURI = "https://sbt-orefs-091.efstst.sigma.sbrf.ru";
+        RestAssured.useRelaxedHTTPSValidation();
+
+        // Логинимся
+        given()
+                .log().all()
+                .auth()
+                .basic("testcrmMANAGER302-ext","qa12345678")
+                .filter(cookieFilter)
+                .when()
+                .get("mrmkmkb-server/ru.sbrf.bh.sub.ermkmkb/mrm-rest/auth")
+                .then()
+                .log().all()
+                .body("success", equalTo(true))
+                .statusCode(200);
+
+        // Запрашиваем список задач
+        given()
+                .filter(cookieFilter)
+                .log().all()
+                .when()
+                .get("mrmkmkb-server/ru.sbrf.bh.sub.ermkmkb/mrm-rest/tasks?page=1")
+                .then()
+                .log().all()
+                .statusCode(200);
+    }
+
+    @Test
     public void login_and_getProfile_test() {
         // cookieFilter сохранить cookie,
         // что позволит оставаться аутентифицированным пользователем
